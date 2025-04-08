@@ -1,0 +1,72 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+		<link rel="icon" type="image/x-icon" href="/Assets/icons/icon.png">	
+	</head>
+
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three"	: "/Assets/scripts/three.js/build/three.module.js",
+				"gui"  	: "/Assets/scripts/three.js/examples/jsm/libs/lil-gui.module.min.js"
+			}
+		}
+	</script>
+
+	<script id="vertShader" type="x-shader/x-vertex">	
+
+		varying vec2 vXY; 	
+	
+		void main(void) {
+			vXY = position.xy;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}
+	</script>
+	
+	<script id="fragShader" type="x-shader/x-fragment">
+		precision mediump float;
+
+		#define MAX_PTOS 1
+
+		#define SQR(a) (a)*(a)
+
+		uniform vec2 	uBlob;
+
+		varying vec2 	vXY; 	
+			
+		void main(void) {	
+
+			vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+
+			float isoVal = 3.0;
+
+			float dist = sqrt( SQR(uBlob.x - vXY.x) + SQR(uBlob.y - vXY.y) );
+
+			float fImplicita = dist - isoVal;
+
+			if ( fImplicita > 0.0 )
+				color = vec4(0.0, 0.0, fImplicita / isoVal, 1.0);
+			else
+				if ( fImplicita < 0.0 )
+					color = vec4(abs(fImplicita)/isoVal, 0.0, 0.0, 1.0);
+				else
+					color = vec4(1.0, 1.0, 1.0, 1.0);
+
+			gl_FragColor = color;
+		}
+	</script>
+
+	<script type=module src="./2-formaImplicita.js"></script>
+	
+	<body>
+		<h3 id="output-text">Visualizando uma forma implicíta.</h3>
+		<div id="threejs-canvas"></div>
+	</body>
+</html>
+	</body>
+</html>
